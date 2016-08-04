@@ -5,6 +5,7 @@ from google.appengine.ext import db
 import hashlib, hmac
 import random, string
 import re
+import logging
 
 # Loading the templates into the Jinja environment
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -50,8 +51,7 @@ def check_secure_val(h):
 
 # Google DataStore database
 class Entries(db.Model):
-	title = db.StringProperty(required = True)
-	body = db.TextProperty(required = True)
+	content = db.TextProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
 
 class User(db.Model):
@@ -143,10 +143,37 @@ class Logout(webapp2.RequestHandler):
 		self.response.delete_cookie('uid')
 		self.redirect('/')
 
+class WikiEntry(webapp2.RequestHandler):
+	def get(self, wiki_entry):
+		k = db.Key.from_path('Entries', wiki_entry)
+		# logging.error(k)
+		entry = db.get(k)
+		# logging.error(entry)
+		# logging.error(entry.key_name)
+		if entry:
+			# logging.error("inside if")
+			self.response.write(render_str('entrypage.html', entry=entry))
+		else:
+			# logging.error("inside else")
+			self.redirect('/edit/' + wiki_entry)
+
+class EditWikiEntry(webapp2.RequestHandler):
+	def get(self, wiki_entry):
+		self.response.write(render_str('edit.html', wiki_entry = wiki_entry))
+
+	def post(self, wiki_entry):
+		content = self.request.get('textarea')
+		if content:
+			e = Entries(key_name = wiki_entry, content = content)
+			e.put()
+		self.redirect('/' + wiki_entry)
+
 # App Handlers
 app = webapp2.WSGIApplication([('/', MainPage),
 								('/signup', SignUp),
 								('/welcome', Welcome),
 								('/login', Login),
-								('/logout', Logout)
+								('/logout', Logout),
+								('/([a-zA-Z0-9_]+)', WikiEntry),
+								('/edit/([a-zA-Z0-9_]+)', EditWikiEntry)
 								], debug = True)

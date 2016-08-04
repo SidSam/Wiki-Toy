@@ -1,3 +1,9 @@
-This is a simple toy implementation of a wiki. A wiki is just a website where you can edit the pages and save those changes (yes, exactly like Wikipedia).
+This is a simple toy implementation of a wiki, a website where you can edit the pages and save those changes.
 
-Right now, I've just added a front page. I'll be adding more functionalities as I go on, update the Readme accordingly.
+Currently, the application has registration, login and logout functionalities. Pages can be edited and saved. Editing may be pure text, but you
+can also write HTML code to directly manipulate the layout of the webpage.
+
+Going to any webpage URL leads to that webpage if it exists, otherwise it directs you to the editing page, where upon adding the contents and 
+then saving, it will redirect you to the newly created webpage with the HTML/non-HTML content.
+
+I'll be adding a history functionality later on, where you can view the edit history of a webpage.
