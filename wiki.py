@@ -161,7 +161,9 @@ class WikiEntry(webapp2.RequestHandler):
 
 class EditWikiEntry(webapp2.RequestHandler):
 	def get(self, wiki_entry):
-		self.response.write(render_str('edit.html', wiki_entry = wiki_entry))
+		ancestor_key = db.Key.from_path('Entries', wiki_entry)
+		entry = db.Query(Entries).ancestor(ancestor_key).order('-created').get()
+		self.response.write(render_str('edit.html', entry_content=entry.content))
 
 	def post(self, wiki_entry):
 		content = self.request.get('textarea')
