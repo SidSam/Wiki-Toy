@@ -51,6 +51,7 @@ def check_secure_val(h):
 
 # Google DataStore database
 class Entries(db.Model):
+	title = db.TextProperty(required = True)
 	content = db.TextProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
 
@@ -145,9 +146,10 @@ class Logout(webapp2.RequestHandler):
 
 class WikiEntry(webapp2.RequestHandler):
 	def get(self, wiki_entry):
-		k = db.Key.from_path('Entries', wiki_entry)
+		ancestor_key = db.Key.from_path('Entries', wiki_entry)
+		entry = db.Query(Entries).ancestor(ancestor_key).order('-created').get()
 		# logging.error(k)
-		entry = db.get(k)
+		# entry = db.get(k)
 		# logging.error(entry)
 		# logging.error(entry.key_name)
 		if entry:
@@ -155,7 +157,7 @@ class WikiEntry(webapp2.RequestHandler):
 			self.response.write(render_str('entrypage.html', entry=entry))
 		else:
 			# logging.error("inside else")
-			self.redirect('/edit/' + wiki_entry)
+			self.redirect(wiki_entry + '/edit')
 
 class EditWikiEntry(webapp2.RequestHandler):
 	def get(self, wiki_entry):
@@ -164,9 +166,17 @@ class EditWikiEntry(webapp2.RequestHandler):
 	def post(self, wiki_entry):
 		content = self.request.get('textarea')
 		if content:
-			e = Entries(key_name = wiki_entry, content = content)
+			k = db.Key.from_path('Entries', wiki_entry)
+			e = Entries(title = wiki_entry, content = content, parent = k)
 			e.put()
 		self.redirect('/' + wiki_entry)
+
+class HistoryWikiEntry(webapp2.RequestHandler):
+	def get(self, wiki_entry):
+		ancestor_key = db.Key.from_path('Entries', wiki_entry)
+		entries = db.Query(Entries).ancestor(ancestor_key).order('-created')
+		if entries:
+			self.response.write(render_str('history.html', entries=entries))
 
 # App Handlers
 app = webapp2.WSGIApplication([('/', MainPage),
@@ -175,5 +185,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
 								('/login', Login),
 								('/logout', Logout),
 								('/([a-zA-Z0-9_]+)', WikiEntry),
-								('/edit/([a-zA-Z0-9_]+)', EditWikiEntry)
+								('/([a-zA-Z0-9_]+)/edit', EditWikiEntry),
+								('/([a-zA-Z0-9_]+)/history', HistoryWikiEntry)
 								], debug = True)

@@ -1,0 +1,14 @@
+<html>
+<head>
+	<title>History</title>
+</head>
+<body>
+	{% for entry in entries %}
+		<p>
+		{{ entry.title }}
+		{{ entry.content }}
+		{{ entry.created }}
+		</p>
+	{% endfor %}
+</body>
+</html>
