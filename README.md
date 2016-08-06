@@ -6,4 +6,6 @@ can also write HTML code to directly manipulate the layout of the webpage.
 Going to any webpage URL leads to that webpage if it exists, otherwise it directs you to the editing page, where upon adding the contents and 
 then saving, it will redirect you to the newly created webpage with the HTML/non-HTML content.
 
-I'll be adding a history functionality later on, where you can view the edit history of a webpage.
+I've added a history function see the history of edits performed on a webpage. 
+
+Now all that's left is putting up the links to all that and add some snazzy styling.
